@@ -462,7 +462,7 @@ export default function App() {
                     CHAGEE <span className="text-[#D4AF37]">GOLDEN MAZE</span>
                   </h2>
                   <p className="text-xs text-slate-300 max-w-sm mt-1.5 mb-5 leading-relaxed">
-                    Rotate the 3D rounded maze to guide the tea pearls through the channels and out the top exit within 60 seconds!
+                    Rotate the intricate 3D rounded maze to guide the tea pearls through labyrinth channels and out the top exit within 20 seconds!
                   </p>
 
                   <div className="flex flex-col sm:flex-row items-center gap-3">
@@ -636,7 +636,7 @@ export default function App() {
                   </span>
                 </div>
                 <p className="text-xs text-slate-300 mt-0.5">
-                  Finish the 60-second maze challenge to receive a{' '}
+                  Finish the 20-second maze challenge to receive a{' '}
                   <span className="text-[#D4AF37] font-bold">20% OFF Drink Voucher</span>{' '}
                   applicable to any CHAGEE fresh brew or milk tea.
                 </p>

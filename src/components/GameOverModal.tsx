@@ -85,7 +85,7 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
               : 'Great Effort!'}
           </h2>
           <p className="text-xs text-slate-300">
-            60-second Golden Maze Challenge completed
+            20-second Golden Maze Challenge completed
           </p>
         </div>
 

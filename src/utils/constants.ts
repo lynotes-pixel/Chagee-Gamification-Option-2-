@@ -66,7 +66,7 @@ export const BALL_TYPES: Record<string, BallTypeConfig> = {
 export const INITIAL_USER_POINTS = 108;
 export const GAME_COST_POINTS = 9;
 export const COST_PER_GAME = 9;
-export const GAME_DURATION_SECONDS = 60;
+export const GAME_DURATION_SECONDS = 20;
 
 export const TEA_TRIVIA_QUESTIONS = [
   {
