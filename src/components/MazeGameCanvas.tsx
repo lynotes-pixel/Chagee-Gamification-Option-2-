@@ -7,6 +7,7 @@ import { Zap, RotateCcw, RotateCw } from 'lucide-react';
 interface MazeGameCanvasProps {
   isPlaying: boolean;
   onBallEscaped: (ballType: BallColor, points: number, totalEscaped: number) => void;
+  onBombDetonated?: () => void;
   onGameComplete?: () => void;
   soundEnabled: boolean;
 }
@@ -34,6 +35,7 @@ interface WallPin {
 export const MazeGameCanvas: React.FC<MazeGameCanvasProps> = ({
   isPlaying,
   onBallEscaped,
+  onBombDetonated,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -52,6 +54,29 @@ export const MazeGameCanvas: React.FC<MazeGameCanvasProps> = ({
   const animationFrameRef = useRef<number | null>(null);
   const lastClinkTimeRef = useRef<number>(0);
   const shakeEffectRef = useRef<number>(0);
+
+  // Explosion effect state
+  const explosionRef = useRef<{
+    active: boolean;
+    startTime: number;
+    x: number;
+    y: number;
+    particles: Array<{
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      size: number;
+      color: string;
+      alpha: number;
+    }>;
+  }>({
+    active: false,
+    startTime: 0,
+    x: 0,
+    y: 0,
+    particles: [],
+  });
 
   // Rotation button press states for continuous rotation
   const rotateLeftPressed = useRef<boolean>(false);
@@ -156,11 +181,12 @@ export const MazeGameCanvas: React.FC<MazeGameCanvasProps> = ({
           y: Math.sin(ang) * rad + 0.03,
           vx: (Math.random() - 0.5) * 0.002,
           vy: (Math.random() - 0.5) * 0.002,
-          radius: 0.022,
+          radius: typeConfig.id === 'bomb' ? 0.025 : 0.022,
           colorType: typeConfig.id,
           points: typeConfig.points,
           escaped: false,
           alpha: 1.0,
+          isBomb: typeConfig.isBomb || typeConfig.id === 'bomb',
         });
       }
     });
@@ -514,29 +540,102 @@ export const MazeGameCanvas: React.FC<MazeGameCanvasProps> = ({
 
         // Escape check (r > 0.94)
         if (lr > 0.94) {
-          b.escaped = true;
-          b.escapeTime = Date.now();
-          b.vx = (Math.random() - 0.5) * 0.005;
-          b.vy = 0.005 + Math.random() * 0.004;
-
-          escapedCountRef.current += 1;
-          onBallEscaped(b.colorType, b.points, escapedCountRef.current);
-          soundManager.playBallEscape(b.points);
-
           const screenX = cx + b.x * mazeR;
           const screenY = cy + b.y * mazeR;
-          const conf = BALL_TYPES[b.colorType];
 
-          scorePopupsRef.current.push({
-            id: Math.random().toString(),
-            x: screenX,
-            y: screenY,
-            points: b.points,
-            color: conf.color,
-            text: `+${b.points}`,
-            opacity: 1.0,
-            createdAt: Date.now(),
-          });
+          if (b.isBomb || b.colorType === 'bomb') {
+            // === HAZARD BOMB DETONATION: RESETS EVERYTHING ===
+            soundManager.playBombExplosion();
+            shakeEffectRef.current = 28;
+
+            // Spawn explosion particles
+            const parts: Array<{
+              x: number;
+              y: number;
+              vx: number;
+              vy: number;
+              size: number;
+              color: string;
+              alpha: number;
+            }> = [];
+            for (let p = 0; p < 45; p++) {
+              const pAng = Math.random() * Math.PI * 2;
+              const pSpeed = 2 + Math.random() * 7;
+              parts.push({
+                x: screenX,
+                y: screenY,
+                vx: Math.cos(pAng) * pSpeed,
+                vy: Math.sin(pAng) * pSpeed,
+                size: 3 + Math.random() * 6,
+                color: ['#ef4444', '#f97316', '#eab308', '#ffffff', '#7f1d1d'][Math.floor(Math.random() * 5)],
+                alpha: 1.0,
+              });
+            }
+
+            explosionRef.current = {
+              active: true,
+              startTime: Date.now(),
+              x: screenX,
+              y: screenY,
+              particles: parts,
+            };
+
+            // Reset all balls back into the center flask
+            balls.forEach((ball) => {
+              const rad = Math.random() * 0.12;
+              const ang = Math.random() * Math.PI * 2;
+              ball.x = Math.cos(ang) * rad;
+              ball.y = Math.sin(ang) * rad + 0.03;
+              ball.vx = (Math.random() - 0.5) * 0.003;
+              ball.vy = (Math.random() - 0.5) * 0.003;
+              ball.escaped = false;
+              ball.alpha = 1.0;
+            });
+
+            escapedCountRef.current = 0;
+
+            // Notify parent App state
+            if (onBombDetonated) {
+              onBombDetonated();
+            }
+
+            // Big warning score popup
+            scorePopupsRef.current.push({
+              id: Math.random().toString(),
+              x: cx,
+              y: cy - 25,
+              points: 0,
+              color: '#ef4444',
+              text: '💥 BOMB DETONATED! RESET! 💥',
+              opacity: 1.0,
+              createdAt: Date.now(),
+            });
+
+            break; // Stop processing remaining balls for this frame
+          } else {
+            // === NORMAL TEA PEARL ESCAPE ===
+            b.escaped = true;
+            b.escapeTime = Date.now();
+            b.vx = (Math.random() - 0.5) * 0.005;
+            b.vy = 0.005 + Math.random() * 0.004;
+
+            escapedCountRef.current += 1;
+            onBallEscaped(b.colorType, b.points, escapedCountRef.current);
+            soundManager.playBallEscape(b.points);
+
+            const conf = BALL_TYPES[b.colorType];
+
+            scorePopupsRef.current.push({
+              id: Math.random().toString(),
+              x: screenX,
+              y: screenY,
+              points: b.points,
+              color: conf.color,
+              text: `+${b.points}`,
+              opacity: 1.0,
+              createdAt: Date.now(),
+            });
+          }
         }
       }
 
@@ -740,13 +839,97 @@ export const MazeGameCanvas: React.FC<MazeGameCanvasProps> = ({
           ctx.strokeStyle = 'rgba(255, 220, 100, 0.6)';
           ctx.lineWidth = 1.5;
           ctx.stroke();
+        } else if (b.colorType === 'bomb' || b.isBomb) {
+          // Hazard Pulsing Glow Halo
+          const pulse = Math.sin(Date.now() * 0.012);
+          ctx.beginPath();
+          ctx.arc(bx, by, bRad * (1.35 + 0.25 * pulse), 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(239, 68, 68, ${0.5 + 0.35 * pulse})`;
+          ctx.lineWidth = 2;
+          ctx.stroke();
+
+          // Burning fuse spark on top-right of the bomb ball
+          ctx.beginPath();
+          ctx.arc(bx + bRad * 0.45, by - bRad * 0.45, bRad * 0.28, 0, Math.PI * 2);
+          ctx.fillStyle = '#ff4500';
+          ctx.shadowColor = '#f97316';
+          ctx.shadowBlur = 6;
+          ctx.fill();
+          ctx.shadowBlur = 0;
+
+          // Inner mini fuse glow
+          ctx.beginPath();
+          ctx.arc(bx + bRad * 0.45, by - bRad * 0.45, bRad * 0.12, 0, Math.PI * 2);
+          ctx.fillStyle = '#ffedd5';
+          ctx.fill();
+
+          // Bomb icon / cross marking on the sphere
+          ctx.font = 'bold 8px sans-serif';
+          ctx.fillStyle = '#ef4444';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('💣', bx, by + 1);
         }
 
         ctx.restore();
       }
 
-      // 6. DRAW FLOATING SCORE POPUPS
       const now = Date.now();
+
+      // 6. DRAW EXPLOSION DETONATION EFFECT IF ACTIVE
+      if (explosionRef.current.active) {
+        const exp = explosionRef.current;
+        const elapsed = now - exp.startTime;
+        if (elapsed > 1100) {
+          exp.active = false;
+        } else {
+          const progress = elapsed / 1100;
+          const blastRadius = progress * mazeR * 1.5;
+          const blastAlpha = Math.max(0, 1 - progress);
+
+          ctx.save();
+
+          // Red screen flash
+          ctx.fillStyle = `rgba(239, 68, 68, ${blastAlpha * 0.28})`;
+          ctx.fillRect(0, 0, width, height);
+
+          // Outer shockwave wave
+          ctx.beginPath();
+          ctx.arc(exp.x, exp.y, blastRadius, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(239, 68, 68, ${blastAlpha * 0.9})`;
+          ctx.lineWidth = Math.max(2, 14 * (1 - progress));
+          ctx.stroke();
+
+          // Inner shockwave wave
+          ctx.beginPath();
+          ctx.arc(exp.x, exp.y, blastRadius * 0.65, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(251, 146, 60, ${blastAlpha * 0.75})`;
+          ctx.lineWidth = Math.max(1.5, 8 * (1 - progress));
+          ctx.stroke();
+
+          // Explosion particles
+          for (const p of exp.particles) {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vx *= 0.93;
+            p.vy *= 0.93;
+            p.alpha = Math.max(0, 1 - progress * 1.15);
+
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size * (1 - progress * 0.4), 0, Math.PI * 2);
+            ctx.fillStyle = p.color;
+            ctx.globalAlpha = p.alpha;
+            ctx.shadowColor = p.color;
+            ctx.shadowBlur = 8;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+          }
+
+          ctx.restore();
+        }
+      }
+
+      // 7. DRAW FLOATING SCORE POPUPS
       scorePopupsRef.current = scorePopupsRef.current.filter((pop) => {
         const elapsed = now - pop.createdAt;
         if (elapsed > 1200) return false;
@@ -778,7 +961,7 @@ export const MazeGameCanvas: React.FC<MazeGameCanvasProps> = ({
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [canvasSize, getMazeGeometry, isPlaying, onBallEscaped]);
+  }, [canvasSize, getMazeGeometry, isPlaying, onBallEscaped, onBombDetonated]);
 
   return (
     <div

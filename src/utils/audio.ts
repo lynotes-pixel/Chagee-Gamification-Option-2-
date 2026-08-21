@@ -129,6 +129,45 @@ class SoundFX {
     osc.stop(this.ctx.currentTime + 0.04);
   }
 
+  public playBombExplosion() {
+    if (!this.enabled) return;
+    this.initCtx();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+
+    // 1. Deep sub-bass boom
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(150, now);
+    osc.frequency.exponentialRampToValueAtTime(30, now + 0.5);
+
+    gain.gain.setValueAtTime(0.3, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.6);
+
+    // 2. Alarm buzz dissonant tones
+    const buzz1 = this.ctx.createOscillator();
+    const buzzGain = this.ctx.createGain();
+    buzz1.type = 'square';
+    buzz1.frequency.setValueAtTime(220, now);
+    buzz1.frequency.setValueAtTime(180, now + 0.15);
+    buzz1.frequency.setValueAtTime(140, now + 0.3);
+
+    buzzGain.gain.setValueAtTime(0.15, now);
+    buzzGain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+
+    buzz1.connect(buzzGain);
+    buzzGain.connect(this.ctx.destination);
+    buzz1.start(now);
+    buzz1.stop(now + 0.45);
+  }
+
   public playGameOver() {
     if (!this.enabled) return;
     this.initCtx();

@@ -80,6 +80,20 @@ export const HowToPlayModal: React.FC<HowToPlayModalProps> = ({ isOpen, onClose 
             </div>
           </div>
 
+          <div className="flex items-start space-x-3 bg-red-950/40 border border-red-500/40 p-3.5 rounded-2xl">
+            <div className="w-7 h-7 rounded-full bg-red-600 text-white font-bold flex items-center justify-center shrink-0">
+              💣
+            </div>
+            <div>
+              <h4 className="font-bold text-sm text-red-300 mb-0.5">
+                DANGER: Avoid the Hazard Bomb Ball!
+              </h4>
+              <p className="text-slate-300 leading-relaxed">
+                Watch out for the glowing Hazard Bomb Pearl! If you rotate the maze carelessly and let the bomb pearl escape through the top exit chute, it will <strong className="text-red-400 font-black">DETONATE and immediately RESET all your collected round points & freed pearls to 0</strong>!
+              </p>
+            </div>
+          </div>
+
           <div className="flex items-start space-x-3 bg-[#002B54]/70 border border-[#D4AF37]/20 p-3.5 rounded-2xl">
             <div className="w-7 h-7 rounded-full bg-[#D4AF37] text-[#001B3A] font-bold flex items-center justify-center shrink-0">
               4
@@ -101,12 +115,28 @@ export const HowToPlayModal: React.FC<HowToPlayModalProps> = ({ isOpen, onClose 
             </h5>
             <div className="grid grid-cols-2 gap-2 text-[11px]">
               {Object.values(BALL_TYPES).map((bt) => (
-                <div key={bt.id} className="flex items-center space-x-2 bg-[#002B54] p-2 rounded-xl border border-[#D4AF37]/15">
-                  <div className="w-3 h-3 rounded-full shrink-0 shadow-sm" style={{ backgroundColor: bt.color }} />
-                  <div className="flex-1 truncate">
-                    <span className="font-medium text-white">{bt.name}</span>
+                <div
+                  key={bt.id}
+                  className={`flex items-center space-x-2 p-2 rounded-xl border ${
+                    bt.isBomb
+                      ? 'bg-red-950/50 border-red-500/40 text-red-200'
+                      : 'bg-[#002B54] border-[#D4AF37]/15'
+                  }`}
+                >
+                  <div
+                    className={`w-3 h-3 rounded-full shrink-0 shadow-sm flex items-center justify-center text-[7px] ${
+                      bt.isBomb ? 'border border-red-500' : ''
+                    }`}
+                    style={{ backgroundColor: bt.color }}
+                  >
+                    {bt.isBomb ? '💣' : null}
                   </div>
-                  <span className="font-mono font-bold text-[#D4AF37]">+{bt.points}</span>
+                  <div className="flex-1 truncate">
+                    <span className={`font-medium ${bt.isBomb ? 'text-red-300' : 'text-white'}`}>{bt.name}</span>
+                  </div>
+                  <span className={`font-mono font-bold ${bt.isBomb ? 'text-red-400 font-black' : 'text-[#D4AF37]'}`}>
+                    {bt.isBomb ? 'RESET 💥' : `+${bt.points}`}
+                  </span>
                 </div>
               ))}
             </div>

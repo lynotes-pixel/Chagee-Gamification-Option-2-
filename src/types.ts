@@ -1,4 +1,4 @@
-export type BallColor = 'green' | 'yellow' | 'red' | 'purple' | 'gold';
+export type BallColor = 'green' | 'yellow' | 'red' | 'purple' | 'gold' | 'bomb';
 
 export interface BallTypeConfig {
   id: BallColor;
@@ -11,6 +11,7 @@ export interface BallTypeConfig {
   shadowColor: string;
   count: number;
   description: string;
+  isBomb?: boolean;
 }
 
 export interface PhysicsBall {
@@ -25,6 +26,7 @@ export interface PhysicsBall {
   escaped: boolean;
   escapeTime?: number;
   alpha: number;
+  isBomb?: boolean;
 }
 
 export interface ScorePopup {

@@ -61,6 +61,19 @@ export const BALL_TYPES: Record<string, BallTypeConfig> = {
     count: 6,
     description: 'Supreme Imperial Harvest Pearl',
   },
+  bomb: {
+    id: 'bomb',
+    name: 'Hazard Bomb Pearl',
+    nameZh: '危险黑雷·炸弹珠',
+    points: 0,
+    color: '#1a1a1a',
+    glowColor: 'rgba(239, 68, 68, 0.95)',
+    highlightColor: '#ff6b35',
+    shadowColor: '#000000',
+    count: 2,
+    description: 'DANGER: Resets all points & pearls if it escapes!',
+    isBomb: true,
+  },
 };
 
 export const INITIAL_USER_POINTS = 108;

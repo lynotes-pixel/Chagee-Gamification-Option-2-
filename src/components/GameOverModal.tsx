@@ -127,27 +127,29 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
             <span className="text-[10px] font-normal text-slate-400">Score per pearl</span>
           </div>
           <div className="grid grid-cols-5 gap-1.5 text-center">
-            {(Object.keys(BALL_TYPES) as BallColor[]).map((col) => {
-              const count = escapedBreakdown[col] || 0;
-              const conf = BALL_TYPES[col];
-              return (
-                <div
-                  key={col}
-                  className="bg-[#001B3A] border border-[#D4AF37]/20 rounded-xl p-1.5 flex flex-col items-center"
-                >
+            {(Object.keys(BALL_TYPES) as BallColor[])
+              .filter((col) => !BALL_TYPES[col].isBomb)
+              .map((col) => {
+                const count = escapedBreakdown[col] || 0;
+                const conf = BALL_TYPES[col];
+                return (
                   <div
-                    className="w-3.5 h-3.5 rounded-full mb-1 shadow-sm"
-                    style={{ backgroundColor: conf.color }}
-                  />
-                  <span className="text-xs font-bold font-mono text-white">
-                    x{count}
-                  </span>
-                  <span className="text-[9px] text-[#D4AF37] font-mono">
-                    +{conf.points}
-                  </span>
-                </div>
-              );
-            })}
+                    key={col}
+                    className="bg-[#001B3A] border border-[#D4AF37]/20 rounded-xl p-1.5 flex flex-col items-center"
+                  >
+                    <div
+                      className="w-3.5 h-3.5 rounded-full mb-1 shadow-sm"
+                      style={{ backgroundColor: conf.color }}
+                    />
+                    <span className="text-xs font-bold font-mono text-white">
+                      x{count}
+                    </span>
+                    <span className="text-[9px] text-[#D4AF37] font-mono">
+                      +{conf.points}
+                    </span>
+                  </div>
+                );
+              })}
           </div>
         </div>
 

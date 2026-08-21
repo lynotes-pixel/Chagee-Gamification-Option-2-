@@ -89,12 +89,14 @@ export default function App() {
   const [timeLeft, setTimeLeft] = useState<number>(GAME_DURATION_SECONDS);
   const [currentScore, setCurrentScore] = useState<number>(0);
   const [escapedCount, setEscapedCount] = useState<number>(0);
+  const [bombDetonatedAlert, setBombDetonatedAlert] = useState<boolean>(false);
   const [escapedBreakdown, setEscapedBreakdown] = useState<Record<BallColor, number>>({
     green: 0,
     yellow: 0,
     red: 0,
     purple: 0,
     gold: 0,
+    bomb: 0,
   });
   const [lastEarnedVoucher, setLastEarnedVoucher] = useState<Voucher | null>(null);
   const [isNewHighScore, setIsNewHighScore] = useState<boolean>(false);
@@ -145,12 +147,14 @@ export default function App() {
     // Reset game state
     setCurrentScore(0);
     setEscapedCount(0);
+    setBombDetonatedAlert(false);
     setEscapedBreakdown({
       green: 0,
       yellow: 0,
       red: 0,
       purple: 0,
       gold: 0,
+      bomb: 0,
     });
     setTimeLeft(GAME_DURATION_SECONDS);
     setIsNewHighScore(false);
@@ -170,6 +174,24 @@ export default function App() {
     },
     []
   );
+
+  // Bomb detonated callback: resets round score and pearls
+  const handleBombDetonated = useCallback(() => {
+    setCurrentScore(0);
+    setEscapedCount(0);
+    setEscapedBreakdown({
+      green: 0,
+      yellow: 0,
+      red: 0,
+      purple: 0,
+      gold: 0,
+      bomb: 0,
+    });
+    setBombDetonatedAlert(true);
+    setTimeout(() => {
+      setBombDetonatedAlert(false);
+    }, 3200);
+  }, []);
 
   // End game logic
   const endGame = useCallback(() => {
@@ -445,9 +467,19 @@ export default function App() {
 
             {/* Canvas Maze Component */}
             <div className="relative w-full flex-1 flex items-center justify-center my-2">
+              {/* Live Bomb Detonation Alert Overlay */}
+              {bombDetonatedAlert && (
+                <div className="absolute top-12 z-30 bg-gradient-to-r from-red-600 to-amber-600 text-white px-5 py-2 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-wider shadow-2xl flex items-center space-x-2 border-2 border-amber-300 animate-bounce">
+                  <span>💥</span>
+                  <span>HAZARD BOMB DETONATED! ALL POINTS & PEARLS RESET!</span>
+                  <span>💥</span>
+                </div>
+              )}
+
               <MazeGameCanvas
                 isPlaying={isPlaying}
                 onBallEscaped={handleBallEscaped}
+                onBombDetonated={handleBombDetonated}
                 soundEnabled={soundOn}
               />
 
@@ -600,20 +632,34 @@ export default function App() {
                 {Object.values(BALL_TYPES).map((item) => (
                   <div
                     key={item.id}
-                    className="flex items-center justify-between p-1.5 rounded-xl bg-[#001B3A]/40 border border-[#D4AF37]/10"
+                    className={`flex items-center justify-between p-1.5 rounded-xl border ${
+                      item.isBomb
+                        ? 'bg-red-950/40 border-red-500/40 shadow-red-950/50 shadow-sm'
+                        : 'bg-[#001B3A]/40 border-[#D4AF37]/10'
+                    }`}
                   >
                     <div className="flex items-center space-x-2">
                       <div
-                        className="w-3.5 h-3.5 rounded-full shadow"
+                        className={`w-3.5 h-3.5 rounded-full shadow flex items-center justify-center text-[8px] ${
+                          item.isBomb ? 'border border-red-500' : ''
+                        }`}
                         style={{ backgroundColor: item.color }}
-                      />
-                      <span className="text-xs text-white font-medium">
+                      >
+                        {item.isBomb ? '💣' : null}
+                      </div>
+                      <span className={`text-xs font-medium ${item.isBomb ? 'text-red-300 font-bold' : 'text-white'}`}>
                         {item.name}
                       </span>
                     </div>
-                    <span className="text-xs font-mono font-black text-[#D4AF37]">
-                      +{item.points}
-                    </span>
+                    {item.isBomb ? (
+                      <span className="text-[10px] font-mono font-black text-red-400 bg-red-900/60 px-1.5 py-0.5 rounded uppercase tracking-wider">
+                        RESET 💥
+                      </span>
+                    ) : (
+                      <span className="text-xs font-mono font-black text-[#D4AF37]">
+                        +{item.points}
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>
