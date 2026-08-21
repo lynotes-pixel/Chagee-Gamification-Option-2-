@@ -1,0 +1,177 @@
+import { BallTypeConfig, WeeklyPrize } from '../types';
+
+export const BALL_TYPES: Record<string, BallTypeConfig> = {
+  green: {
+    id: 'green',
+    name: 'Tieguanyin Jade',
+    nameZh: '铁观音·翠玉',
+    points: 30,
+    color: '#22c55e',
+    glowColor: 'rgba(34, 197, 94, 0.6)',
+    highlightColor: '#86efac',
+    shadowColor: '#14532d',
+    count: 22,
+    description: 'Fresh & Crisp Oolong Tea Pearl',
+  },
+  yellow: {
+    id: 'yellow',
+    name: 'Jasmine Bloom',
+    nameZh: '茉莉花香·琥珀',
+    points: 50,
+    color: '#eab308',
+    glowColor: 'rgba(234, 179, 8, 0.6)',
+    highlightColor: '#fde047',
+    shadowColor: '#713f12',
+    count: 18,
+    description: 'Aromatic Jasmine Green Pearl',
+  },
+  red: {
+    id: 'red',
+    name: 'Da Hong Pao Crimson',
+    nameZh: '大红袍·赤金',
+    points: 80,
+    color: '#ef4444',
+    glowColor: 'rgba(239, 68, 68, 0.6)',
+    highlightColor: '#fca5a5',
+    shadowColor: '#7f1d1d',
+    count: 14,
+    description: 'Rich Wuyi Rock Oolong Pearl',
+  },
+  purple: {
+    id: 'purple',
+    name: 'White Camellia Purple',
+    nameZh: '白雾山茶·紫韵',
+    points: 120,
+    color: '#a855f7',
+    glowColor: 'rgba(168, 85, 247, 0.6)',
+    highlightColor: '#d8b4fe',
+    shadowColor: '#581c87',
+    count: 10,
+    description: 'Delicate Floral Camellia Pearl',
+  },
+  gold: {
+    id: 'gold',
+    name: 'Royal Dragon Well Gold',
+    nameZh: '御前龙井·金露',
+    points: 250,
+    color: '#D4AF37',
+    glowColor: 'rgba(212, 175, 55, 0.8)',
+    highlightColor: '#fef08a',
+    shadowColor: '#854d0e',
+    count: 6,
+    description: 'Supreme Imperial Harvest Pearl',
+  },
+};
+
+export const INITIAL_USER_POINTS = 108;
+export const GAME_COST_POINTS = 9;
+export const COST_PER_GAME = 9;
+export const GAME_DURATION_SECONDS = 60;
+
+export const TEA_TRIVIA_QUESTIONS = [
+  {
+    question: 'Which signature CHAGEE drink features delicate jasmine green tea paired with fresh milk?',
+    options: ['Bo Ya Jue Xian (伯牙绝弦)', 'Gui Hua Duan (桂花弄)', 'Bai Wu Yuan (白雾圆)', 'Chun Shan (春山)'],
+    correct: 0,
+    reward: 10,
+  },
+  {
+    question: 'What is the optimal brewing temperature traditionally used for high mountain oolong tea?',
+    options: ['60°C - 70°C', '75°C - 80°C', '95°C - 100°C', '40°C - 50°C'],
+    correct: 2,
+    reward: 10,
+  },
+  {
+    question: 'How many member points are required to redeem one game of the 3D Golden Maze?',
+    options: ['5 points', '9 points', '20 points', '50 points'],
+    correct: 1,
+    reward: 10,
+  },
+];
+
+export const INITIAL_LEADERBOARD = [
+  {
+    rank: 1,
+    userId: 'u_1',
+    userName: 'Sarah Jenkins',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
+    score: 14850,
+    ballsEscaped: 58,
+    tier: 'Imperial Master',
+    date: '2 hrs ago',
+  },
+  {
+    rank: 2,
+    userId: 'u_2',
+    userName: 'Chen Wei Ming',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&auto=format&fit=crop&q=80',
+    score: 13920,
+    ballsEscaped: 54,
+    tier: 'Grand Tea Artisan',
+    date: '4 hrs ago',
+  },
+  {
+    rank: 3,
+    userId: 'u_3',
+    userName: 'Ahmad Syakir',
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&auto=format&fit=crop&q=80',
+    score: 12640,
+    ballsEscaped: 49,
+    tier: 'Gold Alchemist',
+    date: 'Yesterday',
+  },
+  {
+    rank: 4,
+    userId: 'u_4',
+    userName: 'Emily Zhang',
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80',
+    score: 11480,
+    ballsEscaped: 45,
+    tier: 'Gold Alchemist',
+    date: '2 days ago',
+  },
+  {
+    rank: 5,
+    userId: 'u_5',
+    userName: 'Marcus Lim',
+    avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=100&auto=format&fit=crop&q=80',
+    score: 10250,
+    ballsEscaped: 40,
+    tier: 'Silver Brewer',
+    date: '3 days ago',
+  },
+  {
+    rank: 6,
+    userId: 'u_6',
+    userName: 'Priya Nair',
+    avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80',
+    score: 9320,
+    ballsEscaped: 36,
+    tier: 'Silver Brewer',
+    date: '3 days ago',
+  },
+];
+
+export const WEEKLY_PRIZES: WeeklyPrize[] = [
+  {
+    rank: '1st Place',
+    title: 'Imperial 24K Gold Tumbler Set',
+    subtitle: 'Limited Edition 24K Gold Inlaid Flask + 1 Year Free Fresh Milk Tea',
+    prizeImage: '🏆',
+    tag: 'Grand Champion Prize',
+  },
+  {
+    rank: '2nd - 3rd',
+    title: 'CHAGEE Heritage Porcelain Set',
+    subtitle: 'Handcrafted Jingdezhen Teaware + $150 Drink Vouchers',
+    prizeImage: '🥈',
+    tag: 'Top 3 Masters',
+  },
+  {
+    rank: '4th - 10th',
+    title: 'CHAGEE VIP Privilege Box',
+    subtitle: 'Bespoke Insulated Carrier + 50% Off 10 Drinks Vouchers',
+    prizeImage: '🥉',
+    tag: 'Elite Top 10',
+  },
+];

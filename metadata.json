@@ -1,0 +1,6 @@
+{
+  "name": "CHAGEE Golden Maze Challenge",
+  "description": "Interactive 3D circular maze game with real-time physics, score tiers for colored pearls, weekly leaderboard, points redemption, and 20% discount vouchers.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
